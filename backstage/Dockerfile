@@ -16,7 +16,7 @@ COPY packages/app/package.json ./packages/app/
 COPY packages/backend/package.json ./packages/backend/
 
 RUN --mount=type=cache,target=/root/.yarn \
-    yarn install --immutable
+    yarn install
 
 COPY . .
 

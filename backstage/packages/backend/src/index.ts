@@ -10,6 +10,20 @@ import {
 } from '@backstage/plugin-permission-node/alpha';
 import { IDPPermissionPolicy } from './plugins/permission';
 
+// ── Production safety checks ──────────────────────────────────────────────────
+if (
+  process.env.NODE_ENV === 'production' &&
+  process.env.BACKSTAGE_TOKEN === 'dev-token'
+) {
+  // eslint-disable-next-line no-console
+  console.error(
+    'FATAL: BACKSTAGE_TOKEN is set to the insecure default "dev-token".' +
+      ' Set a strong random token before running in production.' +
+      ' Generate one with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"',
+  );
+  process.exit(1);
+}
+
 // ── Core backend ─────────────────────────────────────────────────────────────
 const backend = createBackend();
 
@@ -19,7 +33,11 @@ backend.add(import('@backstage/plugin-app-backend/alpha'));
 // Auth
 backend.add(import('@backstage/plugin-auth-backend'));
 backend.add(import('@backstage/plugin-auth-backend-module-github-provider'));
-backend.add(import('@backstage/plugin-auth-backend-module-guest-provider'));
+// Guest provider is only available outside production to prevent anonymous
+// access on live deployments.
+if (process.env.NODE_ENV !== 'production') {
+  backend.add(import('@backstage/plugin-auth-backend-module-guest-provider'));
+}
 
 // Catalog
 backend.add(import('@backstage/plugin-catalog-backend/alpha'));

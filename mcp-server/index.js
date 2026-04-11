@@ -256,13 +256,20 @@ server.tool(
   'Check the status and logs of a running or completed scaffolder task.',
   {
     task_id: z.string().describe('Task ID returned by scaffold_service'),
+    after: z
+      .number()
+      .int()
+      .min(0)
+      .default(0)
+      .describe('Return only events with sequence number > this value (use 0 for all events)'),
   },
-  async ({ task_id }) => {
-    const [task, logs] = await Promise.all([
+  async ({ task_id, after }) => {
+    // /eventstream is an SSE endpoint — use /events?after=N for JSON polling.
+    const [task, events] = await Promise.all([
       api(`/api/scaffolder/v2/tasks/${task_id}`),
-      api(`/api/scaffolder/v2/tasks/${task_id}/eventstream`).catch(() => ({ events: [] })),
+      api(`/api/scaffolder/v2/tasks/${task_id}/events?after=${after}`).catch(() => []),
     ]);
-    return ok({ task, recentLogs: logs });
+    return ok({ task, events });
   },
 );
 

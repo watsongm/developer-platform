@@ -37,7 +37,7 @@ jobs:
           restore-keys: yarn-${{ runner.os }}-
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn install
 
       - name: TypeScript type-check
         run: yarn tsc
@@ -72,7 +72,7 @@ jobs:
           restore-keys: yarn-${{ runner.os }}-
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn install
 
       - name: Lint
         run: yarn backstage-cli package lint --since origin/main || true
@@ -141,5 +141,7 @@ jobs:
 
       - name: Lint YAML
         run: |
-          yamllint -d "{extends: relaxed, rules: {line-length: {max: 140}}}" \
+          # .yamllint.yml excludes templates/*/skeleton/ dirs which contain
+          # Nunjucks expressions that are not valid YAML.
+          yamllint -c .yamllint.yml \
             catalog/ templates/ rbac/ backstage/app-config.yaml backstage/app-config.production.yaml

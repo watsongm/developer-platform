@@ -27,6 +27,8 @@ auth:
         signIn:
           resolvers:
             - resolver: usernameMatchingUserEntityName
+    # guest provider is intentionally absent — it is only registered in
+    # development (see backstage/packages/backend/src/index.ts).
 
 techdocs:
   publisher:

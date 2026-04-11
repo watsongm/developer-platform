@@ -1,0 +1,12 @@
+extends: relaxed
+
+rules:
+  line-length:
+    max: 140
+
+# Backstage template skeletons contain Nunjucks expressions (${{ }}) that are
+# not valid YAML — exclude them from linting. Only template.yaml definition
+# files (which are standard YAML) are linted.
+ignore: |
+  templates/*/skeleton
+  templates/*/skeleton/**

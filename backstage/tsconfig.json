@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2019",
+    "lib": ["ES2019", "DOM"],
+    "strict": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "outDir": "dist-types",
+    "rootDir": ".",
+    "composite": false,
+    "declaration": false,
+    "incremental": false,
+    "skipLibCheck": true,
+    "jsx": "react"
+  },
+  "include": ["packages/*/src"],
+  "exclude": [
+    "node_modules",
+    "packages/*/dist",
+    "packages/*/dist-dynamic"
+  ]
+}

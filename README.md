@@ -8,7 +8,7 @@ Enables **self-service** (software templates, scaffolding), **innersource** (Git
 
 ## Architecture
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────┐
 │                        Developer Tools                               │
 │   Claude Desktop  ·  Cursor  ·  VS Code  ·  Browser                 │
@@ -66,7 +66,7 @@ Four roles are enforced via Backstage's native `PermissionPolicy`. Roles are der
 | Catalog create / refresh | ✓ | ✓ | ✗ | ✗ |
 | Catalog delete | ✓ | ✗ | ✗ | ✗ |
 | Scaffolder execute | ✓ | ✓ | ✓ | ✗ |
-| Scaffolder cancel | ✓ | ✓ | ✗ | ✗ |
+| Scaffolder cancel | ✓ | ✓ | ✓ | ✗ |
 | TechDocs read | ✓ | ✓ | ✓ | ✓ |
 | TechDocs create | ✓ | ✓ | ✗ | ✗ |
 | Search | ✓ | ✓ | ✓ | ✓ |
@@ -213,7 +213,7 @@ Option A — via UI: navigate to **Create → Register Existing Component** and 
 
 Option B — via MCP tool:
 
-```
+```text
 register_component(
   catalog_url: "https://github.com/acme-corp/my-service/blob/main/catalog-info.yaml"
 )
@@ -236,7 +236,7 @@ catalog:
 
 Or via MCP:
 
-```
+```text
 list_templates()                          # discover available templates
 scaffold_service(
   template_name: "microservice",
@@ -278,9 +278,11 @@ Backstage permission decisions update on the next catalog sync (default: every 3
 2. Copy `backstage/app-config.production.yaml` — it sets `https` backend URLs and an S3 TechDocs publisher.
 3. Set `TECHDOCS_S3_BUCKET`, `AWS_REGION`, `AWS_ACCOUNT_ID`.
 4. Build the Docker image:
+
    ```bash
    docker build -t idp-backstage:latest backstage/
    ```
+
 5. Push to your container registry and deploy via your orchestration platform (ECS, EKS, Cloud Run, etc.).
 
 ---
@@ -298,7 +300,7 @@ yarn dev                    # starts frontend (3000) + backend (7007) concurrent
 
 ### Project structure
 
-```
+```text
 developer-platform/
 ├── .github/
 │   └── workflows/
