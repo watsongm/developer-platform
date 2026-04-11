@@ -1,0 +1,44 @@
+# Environment
+.env
+*.env.local
+
+# Node
+node_modules/
+dist/
+.cache/
+
+# Yarn
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Backstage build artefacts
+packages/app/dist/
+packages/backend/dist/
+packages/backend/dist-dynamic/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml
+
+# TechDocs local build
+site/

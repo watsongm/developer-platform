@@ -1,0 +1,40 @@
+{
+  "name": "developer-platform",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=18 <21"
+  },
+  "scripts": {
+    "dev": "concurrently \"yarn workspace backend start\" \"yarn workspace app start\"",
+    "start": "yarn workspace backend start",
+    "build": "yarn workspaces foreach -A run build",
+    "tsc": "tsc",
+    "clean": "backstage-cli repo clean",
+    "test": "backstage-cli repo test",
+    "lint": "backstage-cli repo lint --since origin/main",
+    "prettier:check": "prettier --check .",
+    "fix": "backstage-cli repo fix"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "devDependencies": {
+    "@backstage/cli": "^0.27.0",
+    "@backstage/e2e-test-utils": "^0.1.1",
+    "@playwright/test": "^1.32.3",
+    "@spotify/prettier-config": "^15.0.0",
+    "concurrently": "^8.0.0",
+    "lerna": "^7.0.0",
+    "node-gyp": "^10.0.0",
+    "prettier": "^3.0.3",
+    "typescript": "~5.4.0"
+  },
+  "prettier": "@spotify/prettier-config",
+  "resolutions": {
+    "@types/react": "^18",
+    "@types/react-dom": "^18"
+  }
+}

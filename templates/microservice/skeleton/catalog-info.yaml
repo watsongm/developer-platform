@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name }}
+  description: ${{ values.description }}
+  annotations:
+    github.com/project-slug: ${{ values.repoOrg }}/${{ values.name }}
+    backstage.io/techdocs-ref: dir:.
+  tags: [${{ values.language }}, microservice]
+spec:
+  type: service
+  lifecycle: production
+  owner: ${{ values.owner }}
+  {% if values.system %}system: ${{ values.system }}{% endif %}

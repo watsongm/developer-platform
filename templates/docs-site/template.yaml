@@ -1,0 +1,83 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: documentation-site
+  title: Documentation Site
+  description: >
+    Create a TechDocs documentation site backed by a GitHub repo.
+    Includes mkdocs config, a starter index page, and CI to publish to the IDP.
+  tags: [documentation, techdocs]
+spec:
+  owner: group:default/platform-admins
+  type: documentation
+
+  parameters:
+    - title: Documentation details
+      required: [name, description, owner]
+      properties:
+        name:
+          title: Site name
+          type: string
+          description: Kebab-case site name (e.g. platform-handbook)
+          pattern: "^[a-z][a-z0-9-]*$"
+          ui:autofocus: true
+        description:
+          title: Description
+          type: string
+        owner:
+          title: Owner team
+          type: string
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: Group
+
+    - title: Repository
+      required: [repoOrg]
+      properties:
+        repoOrg:
+          title: GitHub organisation
+          type: string
+        repoVisibility:
+          title: Visibility
+          type: string
+          enum: [private, internal, public]
+          default: internal
+
+  steps:
+    - id: fetch-template
+      name: Fetch skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          repoOrg: ${{ parameters.repoOrg }}
+
+    - id: create-repo
+      name: Create GitHub repository
+      action: publish:github
+      input:
+        allowedHosts: [github.com]
+        description: ${{ parameters.description }}
+        repoUrl: github.com?repo=${{ parameters.name }}&owner=${{ parameters.repoOrg }}
+        defaultBranch: main
+        repoVisibility: ${{ parameters.repoVisibility }}
+        topics: [documentation, techdocs, idp-managed]
+
+    - id: register
+      name: Register in catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['create-repo'].output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: GitHub repository
+        url: ${{ steps['create-repo'].output.remoteUrl }}
+      - title: View docs
+        icon: docs
+        entityRef: ${{ steps.register.output.entityRef }}

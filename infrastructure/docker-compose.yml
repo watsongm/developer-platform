@@ -1,0 +1,72 @@
+version: "3.9"
+
+# Internal Developer Platform — local development stack
+#
+# Usage:
+#   cp .env.example .env          # fill in your tokens
+#   docker compose up -d          # start all services
+#   docker compose logs -f        # stream logs
+#
+# Services:
+#   postgres   — Backstage database
+#   backstage  — Backstage app (frontend + backend)
+
+services:
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: idp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: backstage
+      POSTGRES_USER: ${POSTGRES_USER:-backstage}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-backstage}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  # ── Backstage ────────────────────────────────────────────────────────────────
+  backstage:
+    build:
+      context: ../backstage
+      dockerfile: Dockerfile
+    container_name: idp-backstage
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Organisation
+      ORGANIZATION_NAME: ${ORGANIZATION_NAME:-My Organisation}
+      GITHUB_ORG: ${GITHUB_ORG:?GITHUB_ORG is required}
+
+      # Database (must match postgres service above)
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-backstage}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      # GitHub integration & OAuth
+      GITHUB_TOKEN: ${GITHUB_TOKEN:?GITHUB_TOKEN is required}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:?GITHUB_CLIENT_ID is required}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:?GITHUB_CLIENT_SECRET is required}
+
+      # Backstage backend token (used by MCP server)
+      BACKSTAGE_TOKEN: ${BACKSTAGE_TOKEN:-dev-token}
+
+      NODE_ENV: development
+    ports:
+      - "3000:3000"   # frontend
+      - "7007:7007"   # backend API
+    volumes:
+      - ../backstage/app-config.yaml:/app/app-config.yaml:ro
+
+volumes:
+  postgres-data:

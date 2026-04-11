@@ -1,0 +1,64 @@
+---
+# Root catalog — defines the org structure (systems, groups, users)
+# Add your own groups, users and systems below.
+# Backstage auto-discovers this file via the catalog location in app-config.yaml.
+
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: platform
+  description: Internal Developer Platform domain
+  tags: [platform, internal]
+spec:
+  owner: group:default/platform-admins
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: developer-platform
+  description: The IDP itself — Backstage, MCP server, and RBAC infrastructure
+  tags: [platform, backstage]
+spec:
+  owner: group:default/platform-admins
+  domain: platform
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: platform-admins
+  description: Platform engineering team — full IDP admin access
+spec:
+  type: team
+  profile:
+    displayName: Platform Admins
+    email: platform@example.com
+  children: []
+  members: []
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-leads
+  description: Engineering leads — can register components and run all templates
+spec:
+  type: team
+  profile:
+    displayName: Team Leads
+  children: []
+  members: []
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: developers
+  description: Standard engineers — can use templates and view all catalog entries
+spec:
+  type: team
+  profile:
+    displayName: Developers
+  children: []
+  members: []

@@ -1,0 +1,74 @@
+# IDP RBAC Role Definitions
+# ─────────────────────────────────────────────────────────────────────────────
+# Roles are assigned by adding users to the corresponding Backstage Group entity.
+# Group names must match exactly:
+#   group:default/platform-admins
+#   group:default/team-leads
+#   group:default/developers
+#   (everyone else is treated as guest)
+
+roles:
+  - name: platform-admin
+    groupRef: group:default/platform-admins
+    description: >
+      Full unrestricted access to all IDP features.
+      Manages catalog locations, deletes entities, administers RBAC groups,
+      and can view/cancel any scaffolder task.
+    permissions:
+      catalog: [read, create, update, delete, refresh]
+      scaffolder: [create, read, cancel, execute-actions]
+      techdocs: [read]
+      search: [query]
+      kubernetes: [read]
+
+  - name: team-lead
+    groupRef: group:default/team-leads
+    description: >
+      Manages resources for their own team. Can register new components,
+      run all software templates, and refresh catalog entries. Cannot delete
+      catalog entities or manage RBAC groups.
+    permissions:
+      catalog: [read, create, refresh]
+      scaffolder: [create, read, cancel, execute-actions]
+      techdocs: [read]
+      search: [query]
+
+  - name: developer
+    groupRef: group:default/developers
+    description: >
+      Standard engineer role. Can view the full catalog, run software
+      templates to scaffold new services, and read all TechDocs.
+      Cannot register or delete catalog entities.
+    permissions:
+      catalog: [read]
+      scaffolder: [create, read, cancel, execute-actions]
+      techdocs: [read]
+      search: [query]
+
+  - name: guest
+    groupRef: "(unauthenticated or unassigned)"
+    description: >
+      Read-only access to the catalog and TechDocs.
+      Cannot run templates or modify any catalog data.
+      Intended for inner-source consumers who browse but do not build.
+    permissions:
+      catalog: [read]
+      techdocs: [read]
+      search: [query]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Permission matrix
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Action                        | platform-admin | team-lead | developer | guest
+# ─────────────────────────────────────────────────────────────────────────────
+# Catalog: read entities        |       ✓        |     ✓     |     ✓     |   ✓
+# Catalog: register component   |       ✓        |     ✓     |     ✗     |   ✗
+# Catalog: delete entity        |       ✓        |     ✗     |     ✗     |   ✗
+# Catalog: refresh entity       |       ✓        |     ✓     |     ✗     |   ✗
+# Scaffolder: run template      |       ✓        |     ✓     |     ✓     |   ✗
+# Scaffolder: cancel task       |       ✓        |     ✓     |     ✓     |   ✗
+# Scaffolder: read task log     |       ✓        |     ✓     |     ✓     |   ✗
+# TechDocs: read docs           |       ✓        |     ✓     |     ✓     |   ✓
+# Search: query                 |       ✓        |     ✓     |     ✓     |   ✓
+# Kubernetes: view clusters     |       ✓        |     ✗     |     ✗     |   ✗

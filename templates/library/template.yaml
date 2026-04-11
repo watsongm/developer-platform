@@ -1,0 +1,89 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: shared-library
+  title: Shared Library
+  description: >
+    Scaffold an innersource shared library with a catalog entry, semantic
+    versioning, and GitHub Actions publish pipeline.
+  tags: [library, innersource]
+spec:
+  owner: group:default/platform-admins
+  type: library
+
+  parameters:
+    - title: Library details
+      required: [name, description, owner]
+      properties:
+        name:
+          title: Package name
+          type: string
+          description: Kebab-case package name (e.g. auth-utils)
+          pattern: "^[a-z][a-z0-9-]*$"
+          ui:autofocus: true
+        description:
+          title: Description
+          type: string
+        owner:
+          title: Owner team
+          type: string
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: Group
+        language:
+          title: Language
+          type: string
+          enum: [typescript, python, go]
+          default: typescript
+
+    - title: Repository
+      required: [repoOrg]
+      properties:
+        repoOrg:
+          title: GitHub organisation
+          type: string
+        repoVisibility:
+          title: Visibility
+          type: string
+          enum: [private, internal, public]
+          default: internal
+
+  steps:
+    - id: fetch-template
+      name: Fetch skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          language: ${{ parameters.language }}
+          repoOrg: ${{ parameters.repoOrg }}
+
+    - id: create-repo
+      name: Create GitHub repository
+      action: publish:github
+      input:
+        allowedHosts: [github.com]
+        description: ${{ parameters.description }}
+        repoUrl: github.com?repo=${{ parameters.name }}&owner=${{ parameters.repoOrg }}
+        defaultBranch: main
+        repoVisibility: ${{ parameters.repoVisibility }}
+        topics: [library, innersource, idp-managed]
+
+    - id: register
+      name: Register in catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['create-repo'].output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: GitHub repository
+        url: ${{ steps['create-repo'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}

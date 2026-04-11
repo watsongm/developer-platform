@@ -1,0 +1,37 @@
+app:
+  baseUrl: https://${IDP_HOST}
+
+backend:
+  baseUrl: https://${IDP_HOST}
+  listen:
+    port: 7007
+  cors:
+    origin: https://${IDP_HOST}
+  database:
+    client: pg
+    connection:
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      ssl:
+        rejectUnauthorized: true
+
+auth:
+  environment: production
+  providers:
+    github:
+      production:
+        clientId: ${GITHUB_CLIENT_ID}
+        clientSecret: ${GITHUB_CLIENT_SECRET}
+        signIn:
+          resolvers:
+            - resolver: usernameMatchingUserEntityName
+
+techdocs:
+  publisher:
+    type: awsS3
+    awsS3:
+      bucketName: ${TECHDOCS_S3_BUCKET}
+      region: ${AWS_REGION}
+      accountId: ${AWS_ACCOUNT_ID}

@@ -1,0 +1,89 @@
+app:
+  title: Internal Developer Platform
+  baseUrl: http://localhost:3000
+
+organization:
+  name: ${ORGANIZATION_NAME}
+
+backend:
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+    host: 0.0.0.0
+  csp:
+    connect-src: ["'self'", 'http:', 'https:']
+  cors:
+    origin: http://localhost:3000
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
+  database:
+    client: pg
+    connection:
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+  cache:
+    store: memory
+
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_TOKEN}
+
+proxy:
+  endpoints: {}
+
+techdocs:
+  builder: local
+  generator:
+    runIn: local
+  publisher:
+    type: local
+
+auth:
+  environment: development
+  providers:
+    github:
+      development:
+        clientId: ${GITHUB_CLIENT_ID}
+        clientSecret: ${GITHUB_CLIENT_SECRET}
+        signIn:
+          resolvers:
+            - resolver: usernameMatchingUserEntityName
+    guest:
+      dangerouslyAllowOutsideDevelopment: true
+
+scaffolder:
+  defaultAuthor:
+    name: Platform Bot
+    email: platform-bot@${ORGANIZATION_NAME}.com
+  defaultCommitMessage: "chore: scaffold via IDP"
+
+catalog:
+  import:
+    entityFilename: catalog-info.yaml
+    pullRequestBranchName: backstage-integration
+  rules:
+    - allow: [Component, API, Resource, Location, Group, User, System, Domain, Template]
+  locations:
+    # Root org catalog — groups, users, systems
+    - type: url
+      target: https://github.com/${GITHUB_ORG}/developer-platform/blob/main/catalog/catalog-info.yaml
+    # Software templates
+    - type: url
+      target: https://github.com/${GITHUB_ORG}/developer-platform/blob/main/templates/microservice/template.yaml
+    - type: url
+      target: https://github.com/${GITHUB_ORG}/developer-platform/blob/main/templates/library/template.yaml
+    - type: url
+      target: https://github.com/${GITHUB_ORG}/developer-platform/blob/main/templates/docs-site/template.yaml
+
+permission:
+  enabled: true
+
+kubernetes:
+  serviceLocatorMethod:
+    type: multiTenant
+  clusterLocatorMethods:
+    - type: config
+      clusters: []

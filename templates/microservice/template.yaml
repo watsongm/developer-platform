@@ -1,0 +1,111 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: microservice
+  title: Microservice
+  description: >
+    Scaffold a production-ready microservice with a GitHub repo, catalog entry,
+    GitHub Actions CI pipeline, and TechDocs stub.
+  tags: [recommended, nodejs, microservice]
+spec:
+  owner: group:default/platform-admins
+  type: service
+
+  parameters:
+    - title: Service details
+      required: [name, description, owner]
+      properties:
+        name:
+          title: Service name
+          type: string
+          description: Unique kebab-case name for the service (e.g. payment-processor)
+          pattern: "^[a-z][a-z0-9-]*$"
+          ui:autofocus: true
+        description:
+          title: Description
+          type: string
+          description: One-line description shown in the catalog
+        owner:
+          title: Owner
+          type: string
+          description: Team that owns this service
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: Group
+        system:
+          title: System
+          type: string
+          description: System this service belongs to (optional)
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind: System
+
+    - title: Runtime
+      required: [language]
+      properties:
+        language:
+          title: Language / runtime
+          type: string
+          enum: [nodejs, python, go, java]
+          enumNames: [Node.js, Python, Go, Java]
+          default: nodejs
+        port:
+          title: Service port
+          type: integer
+          default: 8080
+
+    - title: Repository
+      required: [repoOrg]
+      properties:
+        repoOrg:
+          title: GitHub organisation
+          type: string
+          description: GitHub org or username where the repo will be created
+        repoVisibility:
+          title: Visibility
+          type: string
+          enum: [private, internal, public]
+          default: internal
+
+  steps:
+    - id: fetch-template
+      name: Fetch skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          language: ${{ parameters.language }}
+          port: ${{ parameters.port }}
+          repoOrg: ${{ parameters.repoOrg }}
+
+    - id: create-repo
+      name: Create GitHub repository
+      action: publish:github
+      input:
+        allowedHosts: [github.com]
+        description: ${{ parameters.description }}
+        repoUrl: github.com?repo=${{ parameters.name }}&owner=${{ parameters.repoOrg }}
+        defaultBranch: main
+        repoVisibility: ${{ parameters.repoVisibility }}
+        topics: [microservice, idp-managed]
+
+    - id: register
+      name: Register in catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['create-repo'].output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: GitHub repository
+        url: ${{ steps['create-repo'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
