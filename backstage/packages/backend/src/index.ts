@@ -28,7 +28,7 @@ if (
 const backend = createBackend();
 
 // App
-backend.add(import('@backstage/plugin-app-backend/alpha'));
+backend.add(import('@backstage/plugin-app-backend'));
 
 // Auth
 backend.add(import('@backstage/plugin-auth-backend'));
@@ -40,26 +40,28 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Catalog
-backend.add(import('@backstage/plugin-catalog-backend/alpha'));
+backend.add(import('@backstage/plugin-catalog-backend'));
 backend.add(
   import('@backstage/plugin-catalog-backend-module-scaffolder-entity-model'),
 );
 backend.add(import('@backstage/plugin-catalog-backend-module-github/alpha'));
 
 // Scaffolder (self-service templates)
-backend.add(import('@backstage/plugin-scaffolder-backend/alpha'));
-backend.add(import('@backstage/plugin-scaffolder-backend-module-github'));
+// NOTE: isolated-vm (scaffolder's sandbox engine) requires Node ≤20.
+// Uncomment these once running on Node 18 or 20.
+// backend.add(import('@backstage/plugin-scaffolder-backend/alpha'));
+// backend.add(import('@backstage/plugin-scaffolder-backend-module-github'));
 
 // TechDocs
 backend.add(import('@backstage/plugin-techdocs-backend/alpha'));
 
 // Search
 backend.add(import('@backstage/plugin-search-backend/alpha'));
-backend.add(import('@backstage/plugin-search-backend-module-catalog/alpha'));
+backend.add(import('@backstage/plugin-search-backend-module-catalog'));
 backend.add(import('@backstage/plugin-search-backend-module-techdocs/alpha'));
 
 // Proxy
-backend.add(import('@backstage/plugin-proxy-backend/alpha'));
+backend.add(import('@backstage/plugin-proxy-backend'));
 
 // ── Permission (RBAC) ─────────────────────────────────────────────────────────
 // Custom module that injects our IDP permission policy
@@ -78,5 +80,9 @@ const idpPermissionModule = createBackendModule({
 
 backend.add(import('@backstage/plugin-permission-backend/alpha'));
 backend.add(idpPermissionModule);
+
+// MCP — exposes catalog, TechDocs, and scaffolder as AI agent tools
+// Connect any MCP-compatible agent to POST /api/mcp
+backend.add(import('backstage-plugin-mcp-backend'));
 
 backend.start();
