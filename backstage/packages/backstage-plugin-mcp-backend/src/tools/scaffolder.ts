@@ -35,6 +35,8 @@ export function registerScaffolderTools(server: McpServer, opts: ToolOptions): v
   }
 
   // ── list_templates ──────────────────────────────────────────────────────
+  // Note: scaffold_service and get_scaffolder_task require
+  // @backstage/plugin-scaffolder-backend to be registered in the host app.
   server.tool(
     'list_templates',
     'List all available Backstage software templates (self-service scaffolding recipes).',

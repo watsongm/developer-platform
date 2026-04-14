@@ -96,8 +96,12 @@ export function registerCatalogTools(server: McpServer, opts: ToolOptions): void
       const filters: Record<string, string>[] = [];
       if (kind) filters.push({ kind });
       if (filter) {
-        const [key, value] = filter.split('=');
-        if (key && value) filters.push({ [key]: value });
+        const eqIdx = filter.indexOf('=');
+        if (eqIdx > 0) {
+          const key = filter.slice(0, eqIdx);
+          const value = filter.slice(eqIdx + 1);
+          filters.push({ [key]: value });
+        }
       }
       const { items } = await catalogClient.getEntities(
         { filter: filters.length ? filters : undefined, limit },
