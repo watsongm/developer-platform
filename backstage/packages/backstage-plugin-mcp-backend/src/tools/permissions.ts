@@ -22,7 +22,7 @@ export function registerPermissionsTools(server: McpServer, opts: ToolOptions): 
           'Entity ref to check against for resource permissions, e.g. component:default/my-service',
         ),
     },
-    async ({ permission: permissionName, resource_ref }) => {
+    async ({ permission: permissionName, resource_ref: _resource_ref }) => {
       const credentials = credentialStore.getStore();
       if (!credentials) throw new Error('No credentials in context');
 
