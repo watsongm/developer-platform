@@ -1,4 +1,3 @@
-import { AsyncLocalStorage } from 'async_hooks';
 import { Router } from 'express';
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,10 +14,13 @@ import type {
 import type { Config } from '@backstage/config';
 import type { CatalogClient } from '@backstage/catalog-client';
 
+import { credentialStore, type ToolOptions } from './context';
 import { registerCatalogTools } from './tools/catalog';
 import { registerScaffolderTools } from './tools/scaffolder';
 import { registerTechDocsTools } from './tools/techdocs';
 import { registerPermissionsTools } from './tools/permissions';
+
+export { credentialStore, type ToolOptions } from './context';
 
 export interface McpRouterOptions {
   logger: LoggerService;
@@ -29,13 +31,6 @@ export interface McpRouterOptions {
   permissions: PermissionsService;
   catalogClient: CatalogClient;
 }
-
-/**
- * AsyncLocalStorage that carries the caller's Backstage credentials through
- * an MCP request — tool handlers read this to get the per-request identity
- * without needing it threaded through the McpServer registration API.
- */
-export const credentialStore = new AsyncLocalStorage<BackstageCredentials>();
 
 export async function createMcpRouter(opts: McpRouterOptions): Promise<Router> {
   const { logger, config, httpAuth, auth, discovery, permissions, catalogClient } = opts;
@@ -177,15 +172,4 @@ export async function createMcpRouter(opts: McpRouterOptions): Promise<Router> {
   });
 
   return router;
-}
-
-/**
- * Options passed to each tool registration function.
- */
-export interface ToolOptions {
-  auth: AuthService;
-  discovery: DiscoveryService;
-  permissions: PermissionsService;
-  catalogClient: CatalogClient;
-  logger: LoggerService;
 }

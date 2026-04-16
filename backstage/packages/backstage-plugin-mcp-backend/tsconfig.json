@@ -3,7 +3,10 @@
   "compilerOptions": {
     "outDir": "../../dist-types/packages/backstage-plugin-mcp-backend/src",
     "rootDir": "src",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true
   },
   "include": ["src"],
   "exclude": ["node_modules"]
