@@ -1,0 +1,27 @@
+# Local development overrides — NOT committed (gitignored)
+# Uses SQLite in-memory so no Postgres is needed for local dev.
+organization:
+  name: dev
+
+backend:
+  database:
+    client: better-sqlite3
+    connection: ':memory:'
+
+auth:
+  providers:
+    github:
+      development:
+        clientId: dev
+        clientSecret: dev
+
+integrations:
+  github:
+    - host: github.com
+      token: dev-token
+
+catalog:
+  locations: []
+
+mcp:
+  sessionTimeoutMinutes: 30
