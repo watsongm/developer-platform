@@ -1,0 +1,31 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "backstage-frontend",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd backstage && npx yarn --ignore-engines install && npx yarn --ignore-engines workspace app start"],
+      "port": 3000,
+      "autoPort": false
+    },
+    {
+      "name": "backstage-backend",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd backstage && npx yarn --ignore-engines install && npx yarn --ignore-engines workspace backend start"],
+      "port": 7007
+    },
+    {
+      "name": "backstage-dev",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd backstage && npx yarn --ignore-engines install && npx yarn --ignore-engines --ignore-engines dev"],
+      "port": 3000
+    },
+    {
+      "name": "mcp-server",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd mcp-server && npm install && node index.js"],
+      "port": 9999,
+      "autoPort": true
+    }
+  ]
+}
